@@ -2,10 +2,13 @@
     <string name="app_name">Die Bau Login App</string>
     <string name="login_background_image_description">Login background image</string>
     <string name="login_screen_title">Login App</string>
-    <string name="login_screen_usename_icon_description">Icon username</string>
-    <string name="login_screen_password_icon_description">Icon password</string>
-    <string name="login_screen_usename_hint">Username</string>
-    <string name="login_screen_password_hint">Password</string>
-    <string name="login_screen_button">Log In</string>
-    <string name="screen_logout_description">Logout icon</string>
+    <string name="login_screen_usename_icon_description">Icono de nombre de usuario</string>
+    <string name="login_screen_password_icon_description">Icono de contraseña</string>
+    <string name="login_screen_usename_hint">Nombre de usuario</string>
+    <string name="login_screen_password_hint">Contraseña</string>
+    <string name="login_screen_login_text">Iniciar sesión</string>
+    <string name="screen_logout_description">Cerrar sesión</string>
+    <string name="baubap_logo">Baubap logo</string>
+    <string name="reset_password">¿Olvidaste tu password? Recuperalo aquí</string>
+    <string name="signup_title">Crear cuenta</string>
 </resources>
