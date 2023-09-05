@@ -54,17 +54,17 @@ class SignupViewModel @Inject constructor(
     }
 
     fun setUsername(username: String) {
-        _signupState.value = _signupState.value.copy(username = username)
+        _signupState.value = signupState.value.copy(username = username)
         isFormValid()
     }
 
     fun setPassword(password: String) {
-        _signupState.value = _signupState.value.copy(password = password)
+        _signupState.value = signupState.value.copy(password = password)
         isFormValid()
     }
 
     fun setConfirmedPassword(password2: String) {
-        _signupState.value = _signupState.value.copy(confirmPassword = password2)
+        _signupState.value = signupState.value.copy(confirmPassword = password2)
         isFormValid()
     }
 
@@ -74,12 +74,12 @@ class SignupViewModel @Inject constructor(
 
     private fun isFormValid() {
         _signupState.value = with(_signupState.value) {
-            val regexString = "[a-zA-Z]+"
-            val isNameCorrect = name.matches(regexString.toRegex())
+            val isNameCorrect = name.length > 4
+            val isUserNameCorrect = username.length > 4
             val isPasswordCorrect = password.length > 8
             val arePasswordMatching = password == confirmPassword
             this.copy(
-                isSignupButtonEnabled = isNameCorrect and isPasswordCorrect and arePasswordMatching
+                isSignupButtonEnabled = isNameCorrect && isUserNameCorrect && isPasswordCorrect && arePasswordMatching
             )
         }
     }
