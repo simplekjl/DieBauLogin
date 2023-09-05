@@ -5,17 +5,26 @@ import com.example.diebaulogin.domain.repository.ServerRepository
 import io.mockk.MockKAnnotations
 import io.mockk.mockk
 import io.mockk.unmockkAll
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.test.TestCoroutineDispatcher
 import kotlinx.coroutines.test.runTest
 import org.junit.After
 import org.junit.Assert
 import org.junit.Before
+import org.junit.Rule
 import org.junit.Test
+import utils.MainCoroutineRule
 
+@OptIn(ExperimentalCoroutinesApi::class)
 internal class LoginUseCaseTest {
 
     private val serverRepository: ServerRepository = mockk(relaxed = true)
     private lateinit var loginUseCase: LoginUseCase
+
+    @get:Rule
+    var mainCoroutineRule = MainCoroutineRule()
+    private val dispatcher = TestCoroutineDispatcher()
 
     @Before
     fun setUp() {

@@ -28,18 +28,18 @@ class LoginViewModel @Inject constructor(
             result.collect {
                 when (it) {
                     is Resource.Error -> {
-                        _loginState.value = loginState.value.copy(
+                        _loginState.value = _loginState.value.copy(
                             isLoading = false, error = "Algo salío mal, intenta de nuevo"
                         )
                     }
 
                     is Resource.Success -> {
-                        _loginState.value = loginState.value.copy(isLoading = false)
+                        _loginState.value = _loginState.value.copy(isLoading = false)
                         navigator.navigateTo(NavTarget.StartPage)
                     }
 
                     is Resource.Loading -> {
-                        _loginState.value = loginState.value.copy(isLoading = true)
+                        _loginState.value = _loginState.value.copy(isLoading = true)
                     }
                 }
             }

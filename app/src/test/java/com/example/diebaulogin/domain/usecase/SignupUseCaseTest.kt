@@ -30,7 +30,6 @@ internal class SignupUseCaseTest {
                 Signup(
                     "Jose Crisostomo",
                     "simplekjl",
-                    "pass",
                     "pass"
                 )
             )

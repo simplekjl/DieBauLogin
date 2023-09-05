@@ -44,7 +44,7 @@ internal class ServerRepositoryImplTest {
         val expected: Resource.Success<Boolean> = Resource.Success(true)
         coEvery { serverApi.someService() } returns Resource.Success(true)
         runTest {
-            repository.signUp(Signup("Jose Crisostomo ", "simplekjl", "password", "password"))
+            repository.signUp(Signup("Jose Crisostomo ", "simplekjl", "password"))
                 .collectLatest {
                     assertEquals(expected.data, actual = it.data)
                 }
