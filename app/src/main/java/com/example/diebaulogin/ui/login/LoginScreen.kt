@@ -1,206 +1,185 @@
 package com.example.diebaulogin.ui.login
 
+import android.widget.Toast
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.imePadding
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.paddingFromBaseline
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.text.input.PasswordVisualTransformation
-import androidx.compose.ui.unit.Dp
-import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.navigation.NavHostController
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import com.example.diebaulogin.R
-import com.example.diebaulogin.navigation.UiEvent
-import com.example.diebaulogin.ui.theme.CircleSize
-import com.example.diebaulogin.ui.theme.NormalPadding
-import com.example.diebaulogin.ui.theme.SmallPadding
-import com.example.diebaulogin.ui.theme.SoftGreen
-import kotlinx.coroutines.flow.collectLatest
+import com.example.diebaulogin.ui.components.InputField
 
-@ExperimentalMaterial3Api
+@Preview
+@Composable
+fun LoginScreenPreview() {
+    MaterialTheme {
+        LoginScreen(
+            state = LoginState(
+                username = "Jose",
+                password = "Denken16",
+                isLoginButtonEnabled = true
+            )
+        )
+    }
+}
+
 @Composable
 fun LoginScreen(
-    viewModel: LoginViewModel = hiltViewModel(),
-    navController: NavHostController,
+    state: LoginState,
+    onLoginCLicked: (String, String) -> Unit = { _, _ -> },
+    onUsernameChanged: (String) -> Unit = { _ -> },
+    onPasswordChanged: (String) -> Unit = { _ -> },
+    onRecoveryPasswordClicked: () -> Unit = {}
 ) {
-
-    val state = viewModel.state
-
-    LaunchedEffect(key1 = Unit) {
-        viewModel.event.collectLatest { event ->
-            when (event) {
-                is UiEvent.NavigateTo -> {
-                    navController.popBackStack()
-                    navController.navigate(event.screen.route)
-                }
-            }
-        }
+    val focusManager = LocalFocusManager.current
+    val context = LocalContext.current
+    var username by rememberSaveable { mutableStateOf(state.username) }
+    var password by rememberSaveable { mutableStateOf(state.password) }
+    val loginFormVisible by remember { mutableStateOf(true) }
+    val scrollState = rememberScrollState()
+    if (state.error?.isNotBlank() == true) {
+        Toast.makeText(
+            context,
+            context.getText(androidx.compose.ui.R.string.default_error_message),
+            Toast.LENGTH_SHORT
+        ).show()
     }
 
-    if (state.isLoggedIn.not()) {
-        Box(
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+        // padding for navigation bar
+    ) {
+        Image(
+            painter = painterResource(id = R.drawable.baubank_bg),
+            contentDescription = stringResource(R.string.app_name),
+            contentScale = ContentScale.Crop,
             modifier = Modifier.fillMaxSize(),
-        ) {
-            Image(
-                painter = painterResource(id = R.drawable.bg),
-                contentDescription = stringResource(R.string.login_background_image_description),
-                contentScale = ContentScale.Crop,
-                modifier = Modifier.fillMaxSize(),
+        )
+        AnimatedVisibility(
+            visible = loginFormVisible,
+            enter = fadeIn(
+                // Overwrites the initial value of alpha to 0.4f for fade in, 0 by default
+                initialAlpha = 0.4f
+            ),
+            exit = fadeOut(
+                // Overwrites the default animation with tween
+                animationSpec = tween(durationMillis = 250)
             )
+        ) {
             Column(
                 modifier = Modifier
                     .fillMaxSize()
-                    .imePadding(),
+                    .verticalScroll(state = scrollState)
+                    .navigationBarsPadding()
+                    .padding(bottom = 72.dp),
             ) {
-                TestIoTitle(
+                Image(
                     modifier = Modifier
-                        .fillMaxHeight(.3F)
-                        .fillMaxWidth(),
+                        .paddingFromBaseline(top = 150.dp, bottom = 70.dp)
+                        .align(Alignment.CenterHorizontally)
+                        .size(270.dp),
+                    painter = painterResource(R.drawable.baubap_light),
+                    contentDescription = stringResource(R.string.baubap_logo),
                 )
-                Spacer(modifier = Modifier.fillMaxHeight(.2F))
-                TextField(
-                    value = state.username,
-                    onValueChange = { viewModel.onEvent(LoginEvent.OnUsernameChange(it)) },
-                    leadingIcon = {
-                        Icon(
-                            painter = painterResource(id = R.drawable.ic_username),
-                            contentDescription = stringResource(R.string.login_screen_usename_icon_description),
-                        )
-                    },
-                    maxLines = 1,
-                    singleLine = true,
-                    label = {
-                        Text(text = stringResource(R.string.login_screen_usename_hint))
-                    },
+                Spacer(modifier = Modifier.fillMaxHeight(.01F))
+                InputField(
+                    text = username,
                     modifier = Modifier
                         .fillMaxWidth(.8F)
                         .align(Alignment.CenterHorizontally),
+                    hint = R.string.login_screen_usename_hint,
+                    iconDescription = R.string.login_screen_usename_hint,
+                    leadingIcon = R.drawable.ic_username,
+                    isSecure = false,
+                    onValueChange = {
+                        username = it
+                        onUsernameChanged(username)
+                    },
+                    focusManager = focusManager
                 )
-                Spacer(modifier = Modifier.height(SmallPadding))
-                TextField(
-                    value = state.password,
-                    onValueChange = { viewModel.onEvent(LoginEvent.OnPasswordChange(it)) },
-                    leadingIcon = {
-                        Icon(
-                            painter = painterResource(id = R.drawable.ic_lock),
-                            contentDescription = stringResource(R.string.login_screen_password_icon_description),
-                        )
-                    },
-                    maxLines = 1,
-                    singleLine = true,
-                    label = {
-                        Text(text = stringResource(R.string.login_screen_password_hint))
-                    },
+                Spacer(modifier = Modifier.height(8.dp))
+                InputField(
+                    text = password,
                     modifier = Modifier
                         .fillMaxWidth(.8F)
                         .align(Alignment.CenterHorizontally),
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
-                    visualTransformation = PasswordVisualTransformation(),
+                    hint = R.string.login_screen_password_hint,
+                    iconDescription = R.string.login_screen_password_hint,
+                    leadingIcon = R.drawable.ic_lock,
+                    isSecure = true,
+                    onValueChange = {
+                        password = it
+                        onPasswordChanged(password)
+                    },
+                    focusManager = focusManager,
                 )
-                Spacer(modifier = Modifier.height(SmallPadding))
+                Spacer(modifier = Modifier.height(8.dp))
                 Button(
-                    onClick = { viewModel.onEvent(LoginEvent.OnLoginClick) },
+                    onClick = { onLoginCLicked(username, password) },
                     colors = ButtonDefaults.buttonColors(
-                        containerColor = SoftGreen,
+                        MaterialTheme.colorScheme.primary,
                     ),
-                    shape = MaterialTheme.shapes.extraSmall,
+                    shape = MaterialTheme.shapes.small,
                     modifier = Modifier
                         .fillMaxWidth(.8F)
                         .align(Alignment.CenterHorizontally),
-                    enabled = state.isLoginEnabled,
+                    enabled = state.isLoginButtonEnabled,
                 ) {
                     Text(
-                        text = stringResource(R.string.login_screen_button),
+                        text = stringResource(R.string.login_screen_login_text),
                         color = Color.White,
-                        modifier = Modifier.padding(SmallPadding),
+                        style = MaterialTheme.typography.bodySmall,
+                        modifier = Modifier.padding(4.dp),
                     )
                 }
-                Spacer(modifier = Modifier.height(SmallPadding))
-                if (state.isLoading) {
-                    CircularProgressIndicator(
-                        modifier = Modifier.align(Alignment.CenterHorizontally),
-                    )
-                }
-                if (state.error != null) {
-                    Text(
-                        text = state.error,
-                        modifier = Modifier.align(Alignment.CenterHorizontally),
-                        color = Color.Red,
-                    )
-                }
+                Spacer(modifier = Modifier.height(16.dp))
+                Text(
+                    modifier = Modifier
+                        .fillMaxWidth(0.9f)
+                        .clickable { onRecoveryPasswordClicked() },
+                    text = stringResource(R.string.reset_password),
+                    textAlign = TextAlign.End,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = Color.White,
+                )
+                Spacer(modifier = Modifier.height(36.dp))
             }
         }
-    }
-}
-
-@Composable
-fun TestIoTitle(
-    modifier: Modifier = Modifier,
-    textStyle: TextStyle = MaterialTheme.typography.displayLarge,
-    textColor: Color = Color.White,
-    circlePadding: PaddingValues = PaddingValues(bottom = NormalPadding)
-) {
-    Row(
-        modifier = modifier,
-        horizontalArrangement = Arrangement.Center,
-    ) {
-        Text(
-            text = stringResource(R.string.login_screen_title),
-            color = textColor,
-            fontWeight = FontWeight.Bold,
-            style = textStyle,
-            modifier = Modifier.align(Alignment.Bottom),
-        )
-        Circle(
-            modifier = Modifier
-                .align(Alignment.Bottom)
-                .padding(circlePadding),
-        )
-    }
-}
-
-@Composable
-fun Circle(
-    color: Color = SoftGreen,
-    size: Dp = CircleSize,
-    modifier: Modifier = Modifier
-) {
-    Surface(
-        shape = CircleShape,
-        modifier = modifier.size(size),
-        color = color,
-    ) {
-
     }
 }

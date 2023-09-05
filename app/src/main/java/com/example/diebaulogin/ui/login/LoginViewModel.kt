@@ -1,84 +1,66 @@
 package com.example.diebaulogin.ui.login
 
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.diebaulogin.domain.model.Login
 import com.example.diebaulogin.domain.usecase.LoginUseCase
-import com.example.diebaulogin.navigation.UiEvent
+import com.example.diebaulogin.navigation.NavTarget
+import com.example.diebaulogin.navigation.Navigator
+import com.example.diebaulogin.util.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.flow.receiveAsFlow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class LoginViewModel @Inject constructor(
+    private val navigator: Navigator,
     private val loginUseCase: LoginUseCase
 ) : ViewModel() {
+    private val _loginState = MutableStateFlow(LoginState())
+    val loginState = _loginState.asStateFlow()
 
-    var state by mutableStateOf(LoginState())
-        private set
-
-    private val _uiEvent = Channel<UiEvent>()
-    val event = _uiEvent.receiveAsFlow()
-
-    init {
-        checkSession()
-    }
-
-    private fun checkSession() {
+    fun logIn(username: String, password: String) {
+        _loginState.value = loginState.value.copy(isLoading = true)
         viewModelScope.launch {
-            // we can have a case where the session is stored in local like a database
-        }
-    }
-
-    fun onEvent(event: LoginEvent) {
-        when (event) {
-            is LoginEvent.OnPasswordChange -> event.updateState()
-            is LoginEvent.OnUsernameChange -> event.updateState()
-            LoginEvent.OnLoginClick -> onLoginClick()
-        }
-    }
-
-    private fun LoginEvent.OnPasswordChange.updateState() {
-        state = state.copy(
-            password = password,
-            isLoginEnabled = shouldEnableLogin(),
-        )
-    }
-
-    private fun LoginEvent.OnUsernameChange.updateState() {
-        state = state.copy(
-            username = username,
-            isLoginEnabled = shouldEnableLogin(),
-        )
-    }
-
-    private fun shouldEnableLogin(): Boolean =
-        state.username.isNotEmpty() && state.password.isNotEmpty()
-
-    private fun onLoginClick() {
-        state = state.copy(isLoading = true)
-
-        viewModelScope.launch {
-            loginUseCase(
-                Login(username = state.username, password = state.password)
-            ).collectLatest { result ->
-                when (result.data) {
-                    true -> {
-                        // navigate to login
+            val result = loginUseCase(Login(username, password))
+            result.collect {
+                when (it) {
+                    is Resource.Error -> {
+                        _loginState.value = loginState.value.copy(
+                            isLoading = false, error = "Algo salío mal, intenta de nuevo"
+                        )
                     }
 
-                    else -> {
-                        // show error
+                    is Resource.Success -> {
+                        _loginState.value = loginState.value.copy(isLoading = false)
+                        navigator.navigateTo(NavTarget.StartPage)
+                    }
+
+                    is Resource.Loading -> {
+                        _loginState.value = loginState.value.copy(isLoading = true)
                     }
                 }
-
             }
         }
+    }
+
+    fun validateUsername(username: String) {
+        _loginState.value = _loginState.value.copy(
+            username = username,
+            isLoginButtonEnabled = username.isNotBlank() && _loginState.value.password.isNotBlank()
+        )
+    }
+
+    fun validatePassword(pass: String) {
+        _loginState.value = _loginState.value.copy(
+            password = pass,
+            isLoginButtonEnabled = pass.isNotBlank() && _loginState.value.username.isNotBlank()
+        )
+    }
+
+    fun recoverPassword() {
+        navigator.navigateTo(NavTarget.ForgotPassword)
     }
 }

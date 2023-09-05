@@ -11,4 +11,5 @@
     <string name="baubap_logo">Baubap logo</string>
     <string name="reset_password">¿Olvidaste tu password? Recuperalo aquí</string>
     <string name="signup_title">Crear cuenta</string>
+    <string name="login_name_user_hint">Nombre completo</string>
 </resources>
