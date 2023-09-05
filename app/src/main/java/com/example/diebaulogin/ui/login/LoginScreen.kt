@@ -1,6 +1,5 @@
 package com.example.diebaulogin.ui.login
 
-import android.widget.Toast
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
@@ -13,7 +12,6 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.paddingFromBaseline
@@ -127,12 +125,12 @@ fun LoginScreen(
                     },
                     focusManager = focusManager
                 )
-                Spacer(modifier = Modifier.height(8.dp))
                 InputField(
-                    text = password,
                     modifier = Modifier
                         .fillMaxWidth(.8F)
+                        .padding(top = 8.dp)
                         .align(Alignment.CenterHorizontally),
+                    text = password,
                     hint = R.string.login_screen_password_hint,
                     iconDescription = R.string.login_screen_password_hint,
                     leadingIcon = R.drawable.ic_lock,
@@ -143,16 +141,16 @@ fun LoginScreen(
                     },
                     focusManager = focusManager,
                 )
-                Spacer(modifier = Modifier.height(8.dp))
                 Button(
+                    modifier = Modifier
+                        .fillMaxWidth(.8F)
+                        .padding(top = 8.dp)
+                        .align(Alignment.CenterHorizontally),
                     onClick = { onLoginCLicked(username, password) },
                     colors = ButtonDefaults.buttonColors(
                         MaterialTheme.colorScheme.primary,
                     ),
                     shape = MaterialTheme.shapes.small,
-                    modifier = Modifier
-                        .fillMaxWidth(.8F)
-                        .align(Alignment.CenterHorizontally),
                     enabled = state.isLoginButtonEnabled,
                 ) {
                     Text(
@@ -173,15 +171,15 @@ fun LoginScreen(
                     color = Color.White,
                 )
                 OutlinedButton(
+                    modifier = Modifier
+                        .fillMaxWidth(.8F)
+                        .padding(top = 48.dp)
+                        .align(Alignment.CenterHorizontally),
                     onClick = { onSignUpClicked() },
                     colors = ButtonDefaults.buttonColors(
                         MaterialTheme.colorScheme.secondary,
                     ),
                     shape = MaterialTheme.shapes.extraSmall,
-                    modifier = Modifier
-                        .fillMaxWidth(.8F)
-                        .padding(top = 48.dp)
-                        .align(Alignment.CenterHorizontally),
                     enabled = true,
                 ) {
                     Text(
