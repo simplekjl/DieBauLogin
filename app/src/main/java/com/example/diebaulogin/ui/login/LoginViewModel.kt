@@ -63,4 +63,8 @@ class LoginViewModel @Inject constructor(
     fun recoverPassword() {
         navigator.navigateTo(NavTarget.ForgotPassword)
     }
+
+    fun onSignupClicked() {
+        navigator.navigateTo(NavTarget.Signup)
+    }
 }

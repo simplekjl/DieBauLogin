@@ -8,9 +8,11 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.example.diebaulogin.ui.forgotpassword.ForgotPasswordScreen
+import com.example.diebaulogin.ui.home.HomeScreen
 import com.example.diebaulogin.ui.login.LoginScreen
 import com.example.diebaulogin.ui.login.LoginViewModel
 import com.example.diebaulogin.ui.signup.SignUpScreen
+import com.example.diebaulogin.ui.signup.SignupViewModel
 
 @ExperimentalMaterial3Api
 @Composable
@@ -25,19 +27,27 @@ fun AppNavGraph(
                 onLoginCLicked = { u, r -> viewModel.logIn(u, r) },
                 onUsernameChanged = viewModel::validateUsername,
                 onPasswordChanged = viewModel::validatePassword,
-                onRecoveryPasswordClicked = viewModel::recoverPassword
+                onRecoveryPasswordClicked = viewModel::recoverPassword,
+                onSignUpClicked = viewModel::onSignupClicked
             )
         }
         composable(route = NavTarget.ForgotPassword.route) {
             ForgotPasswordScreen()
         }
         composable(route = NavTarget.Signup.route) {
-            val viewModel = hiltViewModel<LoginViewModel>()
-            SignUpScreen(state = viewModel.loginState.value)
+            val viewModel = hiltViewModel<SignupViewModel>()
+            SignUpScreen(
+                state = viewModel.signupState.collectAsState().value,
+                onSignupClicked = viewModel::signUp,
+                onNameChanged = viewModel::setName,
+                onUsernameChanged = viewModel::setUsername,
+                onPasswordChanged = viewModel::setPassword,
+                onConfirmedPassword = viewModel::setConfirmedPassword,
+                onBackToLoginClicked = viewModel::backToLogin
+            )
         }
         composable(route = NavTarget.StartPage.route) {
-            val viewModel = hiltViewModel<LoginViewModel>()
-            SignUpScreen(state = viewModel.loginState.value)
+            HomeScreen()
         }
     }
 }

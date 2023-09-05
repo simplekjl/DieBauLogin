@@ -1,6 +1,5 @@
-package com.example.diebaulogin.ui.login
+package com.example.diebaulogin.ui.signup
 
-import android.widget.Toast
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
@@ -22,8 +21,8 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -35,7 +34,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -45,42 +43,34 @@ import androidx.compose.ui.unit.dp
 import com.example.diebaulogin.R
 import com.example.diebaulogin.ui.components.InputField
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Preview
 @Composable
-fun LoginScreenPreview() {
+fun SignupPreview() {
     MaterialTheme {
-        LoginScreen(
-            state = LoginState(
-                username = "Jose",
-                password = "Denken16",
-                isLoginButtonEnabled = true
-            )
-        )
+        SignUpScreen(SignupState())
     }
 }
 
+@ExperimentalMaterial3Api
 @Composable
-fun LoginScreen(
-    state: LoginState,
-    onLoginCLicked: (String, String) -> Unit = { _, _ -> },
+fun SignUpScreen(
+    state: SignupState,
+    onSignupClicked: () -> Unit = { },
+    onNameChanged: (String) -> Unit = { _ -> },
     onUsernameChanged: (String) -> Unit = { _ -> },
     onPasswordChanged: (String) -> Unit = { _ -> },
-    onRecoveryPasswordClicked: () -> Unit = {},
-    onSignUpClicked: () -> Unit = {}
+    onConfirmedPassword: (String) -> Unit = { _ -> },
+    onBackToLoginClicked: () -> Unit = {}
 ) {
     val focusManager = LocalFocusManager.current
-    val context = LocalContext.current
+    var name by rememberSaveable { mutableStateOf(state.name) }
     var username by rememberSaveable { mutableStateOf(state.username) }
     var password by rememberSaveable { mutableStateOf(state.password) }
-    val loginFormVisible by remember { mutableStateOf(true) }
+    var confirmPassword by rememberSaveable { mutableStateOf(state.confirmPassword) }
+
+    val isFormVisible by remember { mutableStateOf(true) }
     val scrollState = rememberScrollState()
-    if (state.error?.isNotBlank() == true) {
-        Toast.makeText(
-            context,
-            context.getText(androidx.compose.ui.R.string.default_error_message),
-            Toast.LENGTH_SHORT
-        ).show()
-    }
 
     Box(
         modifier = Modifier
@@ -94,7 +84,7 @@ fun LoginScreen(
             modifier = Modifier.fillMaxSize(),
         )
         AnimatedVisibility(
-            visible = loginFormVisible,
+            visible = isFormVisible,
             enter = fadeIn(
                 // Overwrites the initial value of alpha to 0.4f for fade in, 0 by default
                 initialAlpha = 0.4f
@@ -120,6 +110,22 @@ fun LoginScreen(
                     contentDescription = stringResource(R.string.baubap_logo),
                 )
                 Spacer(modifier = Modifier.fillMaxHeight(.01F))
+                InputField(
+                    text = name,
+                    modifier = Modifier
+                        .fillMaxWidth(.8F)
+                        .align(Alignment.CenterHorizontally),
+                    hint = R.string.login_name_user_hint,
+                    iconDescription = R.string.login_name_user_hint,
+                    leadingIcon = R.drawable.ic_username,
+                    isSecure = false,
+                    onValueChange = {
+                        name = it
+                        onNameChanged(name)
+                    },
+                    focusManager = focusManager
+                )
+                Spacer(modifier = Modifier.height(8.dp))
                 InputField(
                     text = username,
                     modifier = Modifier
@@ -149,11 +155,27 @@ fun LoginScreen(
                         password = it
                         onPasswordChanged(password)
                     },
-                    focusManager = focusManager,
+                    focusManager = focusManager
+                )
+                Spacer(modifier = Modifier.height(8.dp))
+                InputField(
+                    text = confirmPassword,
+                    modifier = Modifier
+                        .fillMaxWidth(.8F)
+                        .align(Alignment.CenterHorizontally),
+                    hint = R.string.login_screen_password_confirmed_hint,
+                    iconDescription = R.string.login_screen_password_confirmed_hint,
+                    leadingIcon = R.drawable.ic_lock,
+                    isSecure = true,
+                    onValueChange = {
+                        confirmPassword = it
+                        onConfirmedPassword(confirmPassword)
+                    },
+                    focusManager = focusManager
                 )
                 Spacer(modifier = Modifier.height(8.dp))
                 Button(
-                    onClick = { onLoginCLicked(username, password) },
+                    onClick = { onSignupClicked() },
                     colors = ButtonDefaults.buttonColors(
                         MaterialTheme.colorScheme.primary,
                     ),
@@ -161,46 +183,28 @@ fun LoginScreen(
                     modifier = Modifier
                         .fillMaxWidth(.8F)
                         .align(Alignment.CenterHorizontally),
-                    enabled = state.isLoginButtonEnabled,
+                    enabled = state.isSignupButtonEnabled,
                 ) {
                     Text(
-                        text = stringResource(R.string.login_screen_login_text),
+                        text = stringResource(R.string.signup_button_title),
                         color = Color.White,
                         style = MaterialTheme.typography.bodySmall,
                         modifier = Modifier.padding(4.dp),
                     )
                 }
+                Spacer(modifier = Modifier.height(24.dp))
                 Text(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(top = 32.dp)
-                        .clickable { onRecoveryPasswordClicked() },
-                    text = stringResource(R.string.reset_password),
+                        .clickable { onBackToLoginClicked() },
+                    text = stringResource(R.string.signup_back_to_login),
                     textAlign = TextAlign.Center,
                     style = MaterialTheme.typography.bodySmall,
-                    color = Color.White,
+                    color = Color.White
                 )
-                OutlinedButton(
-                    onClick = { onSignUpClicked() },
-                    colors = ButtonDefaults.buttonColors(
-                        MaterialTheme.colorScheme.secondary,
-                    ),
-                    shape = MaterialTheme.shapes.extraSmall,
-                    modifier = Modifier
-                        .fillMaxWidth(.8F)
-                        .padding(top = 48.dp)
-                        .align(Alignment.CenterHorizontally),
-                    enabled = true,
-                ) {
-                    Text(
-                        modifier = Modifier.padding(4.dp),
-                        text = stringResource(R.string.signup_button_title),
-                        style = MaterialTheme.typography.bodySmall,
-                        textAlign = TextAlign.Center,
-                        color = Color.White
-                    )
-                }
+                Spacer(modifier = Modifier.height(36.dp))
             }
         }
     }
 }
+
