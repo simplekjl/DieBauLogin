@@ -8,6 +8,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.example.diebaulogin.ui.forgotpassword.ForgotPasswordScreen
+import com.example.diebaulogin.ui.forgotpassword.ForgotPasswordViewModel
 import com.example.diebaulogin.ui.home.HomeScreen
 import com.example.diebaulogin.ui.login.LoginScreen
 import com.example.diebaulogin.ui.login.LoginViewModel
@@ -32,7 +33,8 @@ fun AppNavGraph(
             )
         }
         composable(route = NavTarget.ForgotPassword.route) {
-            ForgotPasswordScreen()
+            val viewModel = hiltViewModel<ForgotPasswordViewModel>()
+            ForgotPasswordScreen(onResetPasswordClicked = viewModel::resetPasswordClicked)
         }
         composable(route = NavTarget.Signup.route) {
             val viewModel = hiltViewModel<SignupViewModel>()

@@ -94,7 +94,6 @@ fun Loader(visibility: Boolean) {
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun InputField(
     modifier: Modifier,
@@ -102,7 +101,8 @@ fun InputField(
     @StringRes hint: Int,
     @StringRes iconDescription: Int,
     @DrawableRes leadingIcon: Int?,
-    isSecure: Boolean,
+    isSecure: Boolean = false,
+    isEmail: Boolean = false,
     onValueChange: (text: String) -> Unit,
     focusManager: FocusManager? = null,
     onKeyboardDone: (() -> Unit)? = null
@@ -141,6 +141,9 @@ fun InputField(
         keyboardOptions = if (isSecure) KeyboardOptions(
             keyboardType = KeyboardType.Password,
             imeAction = ImeAction.Done
+        ) else if (isEmail) KeyboardOptions(
+            keyboardType = KeyboardType.Email,
+            imeAction = ImeAction.Next
         ) else KeyboardOptions(
             keyboardType = KeyboardType.Text,
             imeAction = ImeAction.Next

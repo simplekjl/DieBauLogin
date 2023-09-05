@@ -73,12 +73,12 @@ class SignupViewModel @Inject constructor(
     }
 
     private fun isFormValid() {
-        with(_signupState.value) {
+        _signupState.value = with(_signupState.value) {
             val regexString = "[a-zA-Z]+"
             val isNameCorrect = name.matches(regexString.toRegex())
             val isPasswordCorrect = password.length > 8
             val arePasswordMatching = password == confirmPassword
-            _signupState.value = this.copy(
+            this.copy(
                 isSignupButtonEnabled = isNameCorrect and isPasswordCorrect and arePasswordMatching
             )
         }

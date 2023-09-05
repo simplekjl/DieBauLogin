@@ -74,14 +74,6 @@ fun LoginScreen(
     var password by rememberSaveable { mutableStateOf(state.password) }
     val loginFormVisible by remember { mutableStateOf(true) }
     val scrollState = rememberScrollState()
-    if (state.error?.isNotBlank() == true) {
-        Toast.makeText(
-            context,
-            context.getText(androidx.compose.ui.R.string.default_error_message),
-            Toast.LENGTH_SHORT
-        ).show()
-    }
-
     Box(
         modifier = Modifier
             .fillMaxSize()

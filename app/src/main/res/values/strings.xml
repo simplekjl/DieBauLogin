@@ -15,4 +15,7 @@
     <string name="signup_button_title">Crear cuenta</string>
     <string name="login_name_user_hint">Nombre completo</string>
     <string name="start_page_welcome">Bienvenido</string>
+    <string name="reset_password_btn">Recuperar password</string>
+    <string name="reset_password_hint">Ingresa tu correo electronico</string>
+    <string name="go_back_to_login_title">Regresar al login</string>
 </resources>

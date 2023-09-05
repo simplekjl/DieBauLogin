@@ -1,11 +1,10 @@
-package com.example.diebaulogin.ui.signup
+package com.example.diebaulogin.ui.forgotpassword
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -36,7 +35,6 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.diebaulogin.R
@@ -47,27 +45,24 @@ import com.example.diebaulogin.ui.components.InputField
 @Composable
 fun SignupPreview() {
     MaterialTheme {
-        SignUpScreen(SignupState())
+        ForgotPasswordScreen()
     }
 }
 
+data class ForgotPasswordState(
+    val email: String = "",
+    val isResetBtnEnabled: Boolean = email.isNotBlank()
+)
+
 @ExperimentalMaterial3Api
 @Composable
-fun SignUpScreen(
-    state: SignupState,
-    onSignupClicked: () -> Unit = { },
-    onNameChanged: (String) -> Unit = { _ -> },
-    onUsernameChanged: (String) -> Unit = { _ -> },
-    onPasswordChanged: (String) -> Unit = { _ -> },
-    onConfirmedPassword: (String) -> Unit = { _ -> },
-    onBackToLoginClicked: () -> Unit = {}
+fun ForgotPasswordScreen(
+    state: ForgotPasswordState = ForgotPasswordState(),
+    onEmailChanged: (String) -> Unit = {},
+    onResetPasswordClicked: () -> Unit = {}
 ) {
     val focusManager = LocalFocusManager.current
-    var name by rememberSaveable { mutableStateOf(state.name) }
-    var username by rememberSaveable { mutableStateOf(state.username) }
-    var password by rememberSaveable { mutableStateOf(state.password) }
-    var confirmPassword by rememberSaveable { mutableStateOf(state.confirmPassword) }
-
+    var email by rememberSaveable { mutableStateOf("") }
     val isFormVisible by remember { mutableStateOf(true) }
     val scrollState = rememberScrollState()
 
@@ -110,101 +105,38 @@ fun SignUpScreen(
                 )
                 Spacer(modifier = Modifier.fillMaxHeight(.01F))
                 InputField(
-
+                    text = email,
                     modifier = Modifier
                         .fillMaxWidth(.8F)
-                        .padding(top = 8.dp)
                         .align(Alignment.CenterHorizontally),
-                    text = name,
-                    hint = R.string.login_name_user_hint,
-                    iconDescription = R.string.login_name_user_hint,
+                    hint = R.string.reset_password_hint,
+                    iconDescription = R.string.reset_password_hint,
                     leadingIcon = R.drawable.ic_username,
-                    isSecure = false,
+                    isEmail = true,
                     onValueChange = {
-                        name = it
-                        onNameChanged(name)
+                        email = it
+                        onEmailChanged(email)
                     },
                     focusManager = focusManager
                 )
-                InputField(
-                    modifier = Modifier
-                        .fillMaxWidth(.8F)
-                        .padding(top = 8.dp)
-                        .align(Alignment.CenterHorizontally),
-                    text = username,
-                    hint = R.string.login_screen_usename_hint,
-                    iconDescription = R.string.login_screen_usename_hint,
-                    leadingIcon = R.drawable.ic_username,
-                    isSecure = false,
-                    onValueChange = {
-                        username = it
-                        onUsernameChanged(username)
-                    },
-                    focusManager = focusManager
-                )
-                InputField(
-                    modifier = Modifier
-                        .fillMaxWidth(.8F)
-                        .padding(top = 8.dp)
-                        .align(Alignment.CenterHorizontally),
-                    text = password,
-                    hint = R.string.login_screen_password_hint,
-                    iconDescription = R.string.login_screen_password_hint,
-                    leadingIcon = R.drawable.ic_lock,
-                    isSecure = true,
-                    onValueChange = {
-                        password = it
-                        onPasswordChanged(password)
-                    },
-                    focusManager = focusManager
-                )
-                InputField(
-                    modifier = Modifier
-                        .fillMaxWidth(.8F)
-                        .padding(top = 8.dp)
-                        .align(Alignment.CenterHorizontally),
-                    text = confirmPassword,
-                    hint = R.string.login_screen_password_confirmed_hint,
-                    iconDescription = R.string.login_screen_password_confirmed_hint,
-                    leadingIcon = R.drawable.ic_lock,
-                    isSecure = true,
-                    onValueChange = {
-                        confirmPassword = it
-                        onConfirmedPassword(confirmPassword)
-                    },
-                    focusManager = focusManager
-                )
-
                 Button(
-                    modifier = Modifier
-                        .fillMaxWidth(.8F)
-                        .padding(top = 8.dp)
-                        .align(Alignment.CenterHorizontally),
-                    onClick = { onSignupClicked() },
+                    onClick = { onResetPasswordClicked() },
                     colors = ButtonDefaults.buttonColors(
                         MaterialTheme.colorScheme.primary,
                     ),
                     shape = MaterialTheme.shapes.small,
-                    enabled = state.isSignupButtonEnabled,
+                    modifier = Modifier
+                        .fillMaxWidth(.8F)
+                        .align(Alignment.CenterHorizontally),
+                    enabled = email.isNotBlank(),
                 ) {
                     Text(
-                        text = stringResource(R.string.signup_button_title),
+                        text = stringResource(R.string.reset_password_btn),
                         color = Color.White,
                         style = MaterialTheme.typography.bodySmall,
                         modifier = Modifier.padding(4.dp),
                     )
                 }
-                Text(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .align(Alignment.CenterHorizontally)
-                        .padding(top = 32.dp, bottom = 36.dp)
-                        .clickable { onBackToLoginClicked() },
-                    text = stringResource(R.string.go_back_to_login_title),
-                    textAlign = TextAlign.Center,
-                    style = MaterialTheme.typography.bodySmall,
-                    color = Color.White
-                )
             }
         }
     }
